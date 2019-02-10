@@ -11,7 +11,7 @@ object Main extends App {
 
   val config = ConfigFactory.parseFile(new File(file))
 
-  val parameters = Parameter.fromConfig(config)
+  val parameters = Parameters.fromConfig(config)
 
   println(parameters)
 }
