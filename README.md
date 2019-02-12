@@ -10,6 +10,10 @@ Or to migrate a local file:
 
 E.g. `run s3 my-aws-account my-config-bucket path/to/file.conf /AppName/Stage/`
 
+This will create parameters with paths beginning `/AppName/Stage/...`
+
+The format used by this tool is compatible with https://github.com/guardian/simple-configuration, which can be used to load config from Parameter Store.
+
 #### Notes
 
 ##### Lists
