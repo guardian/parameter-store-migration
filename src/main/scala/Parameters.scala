@@ -28,7 +28,7 @@ object Parameters {
           case ConfigValueType.OBJECT =>
             params ++ fromConfig(
               config.getConfigList(key).get(index), //This line means *all* items in the list must be objects
-              Some(s"$key.$index")
+              Some(s"$key.$index.")
             )
 
           case ConfigValueType.NULL =>
@@ -43,14 +43,14 @@ object Parameters {
   /**
     *
     * @param config The Config from which to produce a set of parameters
-    * @param pathPrefix Needed only if config is not the root of the tree
+    * @param pathPrefix A prefix to add to each key
     * @return A set of parameters that can be sent to Parameter Store (i.e. all strings)
     */
   def fromConfig(config: Config, pathPrefix: Option[String] = None): Map[String,String] = {
     config.entrySet().asScala.foldLeft(Map.empty[String,String]) { (params, entry) =>
 
       val key = pathPrefix
-        .map(pre => s"$pre.${entry.getKey}")
+        .map(pre => s"$pre${entry.getKey}")
         .getOrElse(entry.getKey)
 
       entry.getValue.valueType match {
