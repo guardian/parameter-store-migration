@@ -23,7 +23,11 @@ object Parameters {
 
         listItemValue.valueType match {
           case ConfigValueType.STRING | ConfigValueType.NUMBER | ConfigValueType.BOOLEAN =>
-            params + (s"$key.$index" -> listItemValue.unwrapped.toString)
+            if (listItemValue.unwrapped.toString.isEmpty) {
+              println(s"Ignoring empty string value in list for key $key")
+              params
+            }
+            else params + (s"$key.$index" -> listItemValue.unwrapped.toString)
 
           case ConfigValueType.OBJECT =>
             params ++ fromConfig(
@@ -55,7 +59,11 @@ object Parameters {
 
       entry.getValue.valueType match {
         case ConfigValueType.STRING | ConfigValueType.NUMBER | ConfigValueType.BOOLEAN =>
-          params + (key -> entry.getValue.unwrapped.toString)
+          if (entry.getValue.unwrapped.toString.isEmpty) {
+            println(s"Ignoring empty string value for key $key")
+            params
+          }
+          else params + (key -> entry.getValue.unwrapped.toString)
 
         case ConfigValueType.LIST =>
           params ++ fromList(key, config)
