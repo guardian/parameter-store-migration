@@ -10,5 +10,6 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.3.2",
   "com.amazonaws" % "aws-java-sdk-s3" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-ssm" % awsSdkVersion,
+  "com.github.scopt" %% "scopt" % "4.0.0-RC2",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 )

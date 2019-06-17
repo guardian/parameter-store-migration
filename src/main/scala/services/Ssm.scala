@@ -5,7 +5,7 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.simplesystemsmanagement.model.{ParameterType, PutParameterRequest}
 import com.amazonaws.services.simplesystemsmanagement.{AWSSimpleSystemsManagement, AWSSimpleSystemsManagementClientBuilder}
 
-class Ssm(credentialsProvider: AWSCredentialsProviderChain) {
+class Ssm(credentialsProvider: AWSCredentialsProviderChain, overwrite: Boolean) {
   private val ssmClient: AWSSimpleSystemsManagement =
     AWSSimpleSystemsManagementClientBuilder
       .standard()
@@ -18,6 +18,7 @@ class Ssm(credentialsProvider: AWSCredentialsProviderChain) {
         .withName(key)
         .withValue(value)
         .withType(ParameterType.SecureString)
+        .withOverwrite(overwrite)
 
     ssmClient.putParameter(request)
   }

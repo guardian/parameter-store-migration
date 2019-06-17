@@ -4,27 +4,15 @@ import com.typesafe.config._
 import services.{CredentialsProvider, S3, Ssm}
 
 object Main extends App {
-  def info = Console.err.println(
-    """
-      |====
-      |Migrates a Typesafe (HOCON) config file to AWS Parameter Store.
-      |
-      |To migrate a file from S3:
-      |  sbt "run s3 <profile> <bucket> <path> <prefix>"
-      |
-      |Or to migrate a local file:
-      |  sbt "run local <profile> <path> <prefix>"
-      |
-      |E.g. `run s3 my-aws-account my-config-bucket path/to/file.conf /AppName/Stage/`
-    """.stripMargin
-  )
 
-  args.toList match {
-    case "s3" :: profile :: bucket :: path :: prefix :: Nil => put(fromS3(profile, bucket, path, prefix), profile)
+  Options.parse(args) match {
+    case Some(Options(dryRun, overwrite, Some(S3Mode), profile, Some(bucket), path, prefix)) =>
+      put(fromS3(profile, bucket, path, prefix), profile, dryRun, overwrite)
 
-    case "local" :: profile :: path :: prefix :: Nil => put(fromLocal(path, prefix), profile)
+    case Some(Options(dryRun, overwrite, Some(LocalMode), profile, _, path, prefix)) =>
+      put(fromLocal(path, prefix), profile, dryRun, overwrite)
 
-    case _ => info
+    case _ => println(Options.usage)
   }
 
   def fromS3(profile: String, bucket: String, path: String, prefix: String): Map[String,String] = {
@@ -42,11 +30,13 @@ object Main extends App {
     Parameters.fromConfig(config, Some(prefix))
   }
 
-  def put(parameters: Map[String,String], profile: String) = {
-    println(s"\nMigrating:\n${pretty(parameters)}")
+  def put(parameters: Map[String,String], profile: String, dryRun: Boolean, overwrite: Boolean) = {
+    println(s"\nMigrating (dryRun = $dryRun, overwrite = $overwrite):\n${pretty(parameters)}")
 
-    val ssm = new Ssm(CredentialsProvider(profile))
-    parameters foreach (ssm.put _).tupled
+    if (!dryRun) {
+      val ssm = new Ssm(CredentialsProvider(profile), overwrite)
+      parameters foreach (ssm.put _).tupled
+    }
   }
 
   def pretty(parameters: Map[String,String]): String =
