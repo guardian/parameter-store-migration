@@ -6,6 +6,7 @@ case object LocalMode extends Mode
 
 case class Options(
   dryRun: Boolean = false,
+  overwrite: Boolean = false,
   mode: Option[Mode] = None,
   profile: String = "",
   bucket: Option[String] = None,
@@ -33,8 +34,12 @@ object Options {
         .children(
           opt[Unit]('d', "dryRun")
             .optional
-            .action((d, o) => o.copy(dryRun = true))
+            .action((_, o) => o.copy(dryRun = true))
             .text("Prints the parameters that will be created but does not write to Parameter Store"),
+          opt[Unit]('o', "overwrite")
+            .optional
+            .action((_, o) => o.copy(overwrite = true))
+            .text("Overwrites existing items in Parameter Store"),
           arg[String]("<profile>")
             .required
             .action((p, o) => o.copy(profile = p))
@@ -59,8 +64,12 @@ object Options {
         .children(
           opt[Unit]('d', "dryRun")
             .optional
-            .action((d, o) => o.copy(dryRun = true))
+            .action((_, o) => o.copy(dryRun = true))
             .text("Prints the parameters that will be created but does not write to Parameter Store"),
+          opt[Unit]('o', "overwrite")
+            .optional
+            .action((_, o) => o.copy(overwrite = true))
+            .text("Overwrites existing items in Parameter Store"),
           arg[String]("<profile>")
             .required
             .action((p, o) => o.copy(profile = p))

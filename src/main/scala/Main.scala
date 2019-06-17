@@ -6,11 +6,11 @@ import services.{CredentialsProvider, S3, Ssm}
 object Main extends App {
 
   Options.parse(args) match {
-    case Some(Options(dryRun, Some(S3Mode), profile, Some(bucket), path, prefix)) =>
-      put(fromS3(profile, bucket, path, prefix), profile, dryRun)
+    case Some(Options(dryRun, overwrite, Some(S3Mode), profile, Some(bucket), path, prefix)) =>
+      put(fromS3(profile, bucket, path, prefix), profile, dryRun, overwrite)
 
-    case Some(Options(dryRun, Some(LocalMode), profile, _, path, prefix)) =>
-      put(fromLocal(path, prefix), profile, dryRun)
+    case Some(Options(dryRun, overwrite, Some(LocalMode), profile, _, path, prefix)) =>
+      put(fromLocal(path, prefix), profile, dryRun, overwrite)
 
     case _ => println(Options.usage)
   }
@@ -30,11 +30,11 @@ object Main extends App {
     Parameters.fromConfig(config, Some(prefix))
   }
 
-  def put(parameters: Map[String,String], profile: String, dryRun: Boolean) = {
-    println(s"\nMigrating (dryRun = $dryRun):\n${pretty(parameters)}")
+  def put(parameters: Map[String,String], profile: String, dryRun: Boolean, overwrite: Boolean) = {
+    println(s"\nMigrating (dryRun = $dryRun, overwrite = $overwrite):\n${pretty(parameters)}")
 
     if (!dryRun) {
-      val ssm = new Ssm(CredentialsProvider(profile))
+      val ssm = new Ssm(CredentialsProvider(profile), overwrite)
       parameters foreach (ssm.put _).tupled
     }
   }
